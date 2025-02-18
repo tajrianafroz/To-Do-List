@@ -1,6 +1,19 @@
 import React from "react";
+import Status from "./Status";
+import Nothing from "./Nothing";
+import { BiSolidPencil } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
+import { FaCheck } from "react-icons/fa6";
+import { ReactSortable } from "react-sortablejs";
 
-const AllTasks = () => {
+const AllTasks = ({
+  allTasks,
+  setTasks,
+  deleteTask,
+  completeTask,
+  setSelectedTask,
+  selectedTask,
+}) => {
   return (
     <div className="container">
       <table className="table table-responsive table-bordered table-striped">
@@ -12,14 +25,50 @@ const AllTasks = () => {
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-            <tr className="text-center">
-                <td>1</td>
-                <td>Morning</td>
-                <td>Pending / Complete</td>
-                <td>Edit / Delete</td>
-            </tr>
-        </tbody>
+        {allTasks.length == 0 && <Nothing />}
+        <ReactSortable list={allTasks} setList={setTasks} tag={"tbody"}>
+          {allTasks.map((task, index) => {
+            return (
+              <tr key={task.id} className="text-center">
+                <td>{++index}</td>
+                <td>{task.title}</td>
+                <td>
+                  <Status status={task.status} />
+                </td>
+                <td>
+                  <div className="btn-group">
+                    {!task.status && (
+                      <button
+                        onClick={completeTask}
+                        className="btn btn-sm btn-dark"
+                      >
+                        <FaCheck /> Complete
+                      </button>
+                    )}
+
+                    {!task.status && (
+                      <button
+                        onClick={() => setSelectedTask(task)}
+                        className="btn btn-primary btn-sm"
+                      >
+                        <BiSolidPencil />
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      disabled={task.status || selectedTask}
+                      className="btn btn-danger btn-sm"
+                    >
+                      <MdDelete />
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </ReactSortable>
       </table>
     </div>
   );
